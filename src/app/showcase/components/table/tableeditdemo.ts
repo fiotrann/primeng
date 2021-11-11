@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { Product } from '../../domain/product';
 import { ProductService } from '../../service/productservice';
 import { SelectItem } from 'primeng/api';
@@ -15,6 +15,10 @@ import { MessageService } from 'primeng/api';
     `]
 })
 export class TableEditDemo implements OnInit {
+  
+    cols: any[];
+
+    products: Product[];
 
     products1: Product[];
 
@@ -27,11 +31,26 @@ export class TableEditDemo implements OnInit {
     constructor(private productService: ProductService, private messageService: MessageService) { }
 
     ngOnInit() {
+        this.productService.getProductsSmall().then(data => this.products = data);
         this.productService.getProductsSmall().then(data => this.products1 = data);
         this.productService.getProductsSmall().then(data => this.products2 = data);
 
         this.statuses = [{label: 'In Stock', value: 'INSTOCK'},{label: 'Low Stock', value: 'LOWSTOCK'},{label: 'Out of Stock', value: 'OUTOFSTOCK'}]
+        this.cols = [
+            { field: 'code', header: 'Code' },
+            { field: 'name', header: 'Name' },
+            { field: 'category', header: 'Category' },
+            { field: 'quantity', header: 'Quantity' }
+        ];
     }
+
+    onEditComplete (event) {
+        console.log(event);
+    }
+
+    onRowReorder(event) {
+        console.log(event);
+    } 
 
     onRowEditInit(product: Product) {
         this.clonedProducts[product.id] = {...product};
