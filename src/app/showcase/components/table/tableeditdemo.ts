@@ -3,6 +3,7 @@ import { Product } from '../../domain/product';
 import { ProductService } from '../../service/productservice';
 import { ConfirmationService, SelectItem } from 'primeng/api';
 import { MessageService } from 'primeng/api';
+import * as uuid from 'uuid';
 
 @Component({
     templateUrl: './tableeditdemo.html',
@@ -57,6 +58,13 @@ export class TableEditDemo implements OnInit {
                 console.log('this.products in delete', this.products);
             }
         });
+    }
+
+    onAddAnotherColumn() {
+        const product: Product = {
+            id: uuid(),
+        };
+        this.products.push(product);
     }
 
     onEditComplete (event) {
