@@ -9,8 +9,9 @@
 <div class="content-section implementation p-fluid">
     <p-toast></p-toast>
     <div class="card">
+        <form [formGroup]="productsForm"> 
         <h5>Cell Editing with reorder</h5>
-        <p-table [value]="products" 
+        <p-table [value]="tableRowArray.controls" 
                  [columns]="cols"
                  [reorderableColumns]="true"
                  responsiveLayout="scroll"
@@ -19,62 +20,65 @@
             <ng-template pTemplate="header" let-columns>
                 <tr>
                     <th style="width:3rem"></th>
-                    <th *ngFor="let col of columns" pReorderableColumn>
+                    <th *ngFor="let col of columns">
                         {{col.header}}
                     </th>
                     <th>delete</th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-rowData let-product let-index="rowIndex">
-                <tr [pReorderableRow]="index">
+            <ng-template pTemplate="body" let-rowData let-product let-rowIndex="rowIndex">
+                <ng-container formArrayName="tableRowArray">  
+                <tr [pReorderableRow]="rowIndex" [formGroupName]="rowIndex">
                     <td>
                         <span class="pi pi-bars" pReorderableRowHandle></span>
                     </td>
                     <td [pEditableColumn]="product" pEditableColumnField="text">
                         <p-cellEditor>
                             <ng-template pTemplate="input">
-                                <input pInputText type="text" [(ngModel)]="product.code">
+                                <input pInputText type="text" formControlName="code">
                             </ng-template>
                             <ng-template pTemplate="output">
-                                {{product.code}}
+                                {{rowData.get('code').value}}
                             </ng-template>
                         </p-cellEditor>
                     </td>
                     <td pEditableColumn>
                         <p-cellEditor>
                             <ng-template pTemplate="input">
-                                <input pInputText type="text" [(ngModel)]="product.name" required>
+                                <input pInputText type="text" formControlName="name">
                             </ng-template>
                             <ng-template pTemplate="output">
-                                {{product.name}}
+                                {{rowData.get('name').value}}
                             </ng-template>
                         </p-cellEditor>
                     </td>
                     <td pEditableColumn>
                         <p-cellEditor>
                             <ng-template pTemplate="input">
-                                <input pInputText [(ngModel)]="product.inventoryStatus">
+                                <input pInputText formControlName="category">
                             </ng-template>
                             <ng-template pTemplate="output">
-                                {{product.inventoryStatus}}
+                                {{rowData.get('category').value}}
                             </ng-template>
                         </p-cellEditor>
                     </td>
                     <td pEditableColumn>
                         <p-cellEditor>
                             <ng-template pTemplate="input">
-                                <input pInputText type="text" [(ngModel)]="product.price">
+                                <input pInputText type="text" formControlName="quantity">
                             </ng-template>
                             <ng-template pTemplate="output">
-                                {{product.price | currency: 'USD'}}
+                                {{rowData.get('quantity').value}}
                             </ng-template>
                         </p-cellEditor>
                     </td>
-                    <td><button pButton class="p-button-text" (click)="onDelete(product)">delete</button></td>
+                    <td><button pButton class="p-button-text" (click)="onDeleteRow(product, rowIndex)">delete</button></td>
                 </tr>
+            </ng-container>  
             </ng-template>
         </p-table>
-        <button pButton class="p-button-text" (click)="onAddAnotherColumn()">+ add another column</button>
+        </form>
+        <button pButton class="p-button-text" (click)="onAddAnotherRow()">+ add another column</button>
         <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
     </div>
 

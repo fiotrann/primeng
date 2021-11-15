@@ -4,6 +4,7 @@ import { ProductService } from '../../service/productservice';
 import { ConfirmationService, SelectItem } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import * as uuid from 'uuid';
+import { FormGroup, FormBuilder, FormControl, Validators, FormArray } from '@angular/forms';
 
 @Component({
     templateUrl: './tableeditdemo.html',
@@ -16,7 +17,8 @@ import * as uuid from 'uuid';
     `]
 })
 export class TableEditDemo implements OnInit {
-  
+  //https://www.c-sharpcorner.com/article/creating-table-with-reactive-forms-in-angular-9-using-primeng-table2/
+    productsForm: FormGroup;
     cols: any[];
 
     products: Product[];
@@ -32,10 +34,16 @@ export class TableEditDemo implements OnInit {
     constructor(
         private productService: ProductService,
         private messageService: MessageService, 
-        private confirmationService: ConfirmationService) { }
+        private confirmationService: ConfirmationService,
+        private fb: FormBuilder ) { }
 
     ngOnInit() {
-        this.productService.getProductsSmall().then(data => this.products = data);
+        this.productService.getProductsSmall().then(data => {
+            this.products = data
+            if (this.products) {
+                this.populateTableRows()
+            }
+        });
         this.productService.getProductsSmall().then(data => this.products1 = data);
         this.productService.getProductsSmall().then(data => this.products2 = data);
 
@@ -46,25 +54,57 @@ export class TableEditDemo implements OnInit {
             { field: 'category', header: 'Category' },
             { field: 'quantity', header: 'Quantity' }
         ];
+        this.createForm();
     }
 
-    onDelete(product: Product) {
+    private createForm(): void {  
+        
+        this.productsForm = this.fb.group({ 
+            tableRowArray: this.fb.array([])  
+        })  
+    }  
+
+    onDeleteRow(product: Product, index: number) {
         this.confirmationService.confirm({
             message: 'Are you sure you want to delete ' + product.name + '?',
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.products = this.products.filter(val => val.id !== product.id);
-                console.log('this.products in delete', this.products);
+                this.tableRowArray.removeAt(index);
+                console.log('this.products in delete', this.tableRowArray);
             }
         });
     }
 
-    onAddAnotherColumn() {
-        const product: Product = {
-            id: uuid(),
-        };
-        this.products.push(product);
+    onAddAnotherRow() {
+        this.tableRowArray.push(this.createTableRow()); 
+    }
+
+    populateTableRows() {
+        if(this.products) {
+            this.products.forEach(product => this.tableRowArray.push(this.createTableRow(product)))
+        }
+    }
+
+    private createTableRow(product = null): FormGroup { 
+        return this.fb.group({
+            code: new FormControl(!!product ? product.code : null, {  
+                validators: [Validators.required, Validators.minLength(3), Validators.maxLength(50)]  
+            }),
+            name: new FormControl(!!product ? product.name : null, {  
+                validators: [Validators.required, Validators.minLength(3), Validators.maxLength(50)]  
+            }),
+            category: new FormControl(!!product ? product.category : null, {  
+                validators: [Validators.required, Validators.minLength(3), Validators.maxLength(50)]  
+            }),
+            quantity: new FormControl(!!product ? product.quantity : null, {  
+                validators: [Validators.required, Validators.minLength(3), Validators.maxLength(50)]  
+            }),
+        }) 
+    }
+
+    get tableRowArray(): FormArray {  
+        return this.productsForm.get('tableRowArray') as FormArray;  
     }
 
     onEditComplete (event) {

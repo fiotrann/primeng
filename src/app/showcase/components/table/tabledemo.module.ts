@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TableDemo } from './tabledemo';
 import { TableBasicDemo } from './tablebasicdemo';
 import { TableDynamicDemo } from './tabledynamicdemo';
@@ -60,6 +60,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 	imports: [
 		CommonModule,
 		FormsModule,
+		ReactiveFormsModule,
 		TableDemoRoutingModule,
         TableModule,
         CalendarModule,
